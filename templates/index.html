@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+        <script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+        <script src="{{ url_for('static', filename='jquery-3.7.1.min.js') }}"></script>
+        
+        <link rel="shortcut icon" href="{{ url_for('static', filename='icon.ico') }}">
+        <title>Binance Charts | LTCUSDT</title>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+    
+    <body>
+        <div class="trading-view"></div>
+        
+        <script>
+            const chartProperties = {
+                width: window.innerWidth,
+                height: window.innerHeight,
+
+                timeScale: {
+                    timeVisible: true,
+                    secondVisible: false
+                },
+
+                layout: {
+                    background: {color: '#171b26'},
+                    textColor: '#b2b5bE'
+                },
+
+                grid: {
+                    vertLines: {color: '#222631'},
+                    horzLines: {color: '#222631'}
+                }
+            },
+            
+            domElement = document.querySelector('.trading-view'),
+            chart = LightweightCharts.createChart(domElement, chartProperties),
+            candleSeries = chart.addCandlestickSeries(),
+
+            lineSeries1 = chart.addLineSeries({
+                color: '#2962ff',
+                lineWidth: 2,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            lineSeries2 = chart.addLineSeries({
+                color: '#089981',
+	            lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            lineSeries3 = chart.addLineSeries({
+                color: '#f23645',
+                lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            priceLine1 = lineSeries1.createPriceLine({
+                price: 100,
+                color: '#bbbbbb',
+                lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            priceLine2 = lineSeries1.createPriceLine({
+                price: 80,
+                color: '#bbbbbb',
+                lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            priceLine3 = lineSeries1.createPriceLine({
+                price: 20,
+                color: '#bbbbbb',
+                lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            }),
+
+            priceLine4 = lineSeries1.createPriceLine({
+                price: 0,
+                color: '#bbbbbb',
+                lineWidth: 1,
+                priceScaleId: '',
+                scaleMargins: {
+                    top: 0,
+                    bottom: 0
+                }
+            })
+
+            function setChart() {
+                $.ajax({
+                    url: '/chart/{{ limit }}',
+
+                    success: response => {
+                        response = response.split(' | ')
+
+                        var data = JSON.parse(response[0].replace(/&#39;/g, "\"")),
+                            rsi = JSON.parse(response[1]),
+                            stochrsi_K = JSON.parse(response[2]),
+                            stochrsi_D = JSON.parse(response[3]),
+                            markers = JSON.parse(response[4].replace(/&#39;/g, "\"")),
+                            date = new Date(),
+                            currentTime = date.getTime() + 3000
+
+                        date = new Date(currentTime)
+                        console.clear()
+                        console.log('Time: ' + date.toLocaleString())
+
+                        const cdata = data.map(d => {
+                            return {
+                                time: d[0] / 1000,
+                                open: parseFloat(d[1]),
+                                high: parseFloat(d[2]),
+                                low: parseFloat(d[3]),
+                                close: parseFloat(d[4])
+                            }
+                        })
+
+                        candleSeries.setData(cdata)
+                        candleSeries.setMarkers(markers)
+
+                        const lineData1 = rsi.map(d => {
+                            return {
+                                time: d[0],
+                                value: d[1]
+                            }
+                        })
+                        lineSeries1.setData(lineData1)
+
+                        const lineData2 = stochrsi_K.map(d => {
+                            return {
+                                time: d[0],
+                                value: d[1]
+                            }
+                        })
+                        lineSeries2.setData(lineData2)
+
+                        const lineData3 = stochrsi_D.map(d => {
+                            return {
+                                time: d[0],
+                                value: d[1]
+                            }
+                        })
+                        lineSeries3.setData(lineData3)
+                    }
+                })
+            }
+            setInterval(setChart, 1000)
+
+            window.addEventListener('resize', () => {
+                chart.applyOptions({
+                    width: window.innerWidth,
+                    height: window.innerHeight
+                })
+            })
+        </script>
+    </body>
+</html>
