@@ -19,7 +19,7 @@ def limit(limit):
 
 @app.route('/chart/<int:limit>')
 def chart(limit):
-    data = requests.get('https://www.binance.com/fapi/v1/klines?symbol=LTCUSDT&interval=5m&limit=' + str(limit), headers = headers)
+    data = requests.get('https://www.binance.com/fapi/v1/klines?symbol=LTCUSDT&interval=15m&limit=' + str(limit), headers = headers)
     data = json.loads(data.text)
 
     newData = []
@@ -89,7 +89,7 @@ def chart(limit):
                 rsi0 = rsi[i]
                 rsiFlag = True
             
-            elif rsi[i] - rsi0 >= 5 and trend == 'Sell':
+            elif rsi[i] - rsi0 >= 4 and trend == 'Sell':
                 trend = 'Buy'
                 rsiFlag = False
 
@@ -101,7 +101,7 @@ def chart(limit):
                     'text': 'Buy'
                 })
 
-            elif rsi0 - rsi[i] >= 5 and trend == 'Buy':
+            elif rsi0 - rsi[i] >= 4 and trend == 'Buy':
                 trend = 'Sell'
                 rsiFlag = False
 
