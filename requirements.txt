@@ -1,4 +1,5 @@
 Flask
+Gunicorn
 requests
 numpy
 pandas
