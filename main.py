@@ -1,9 +1,13 @@
 from flask import Flask, render_template
+from flask_ngrok import run_with_ngrok
+
 import requests, json
 import numpy as np
 import pandas as pd
 
 app = Flask(__name__)
+run_with_ngrok(app)
+
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/117.0.0.0 Safari/537.36',
     'accept': '*/*'
@@ -122,4 +126,4 @@ def chart(limit):
 
     return render_template('chart.html', data = data, rsi = new_rsi, stochrsi_K = new_stochrsi_K, stochrsi_D = new_stochrsi_D, markers = markers)
 
-app.run(debug = True)
+app.run()
